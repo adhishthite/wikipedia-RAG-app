@@ -10,7 +10,7 @@ def healthcheck():
     """
     Simple healthcheck function that returns a byte string.
     """
-    return b'Hello, World!'
+    return b"Hello, World!"
 
 
 @elasticapm.capture_span()

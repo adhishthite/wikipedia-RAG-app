@@ -16,7 +16,13 @@ class MongoDB:
         __db (Database): The MongoDB database instance.
         collection (Collection): The MongoDB collection instance.
     """
-    def __init__(self, mongo_url: str, database_name: str = "admin", collection_name: str = "admin"):
+
+    def __init__(
+        self,
+        mongo_url: str,
+        database_name: str = "admin",
+        collection_name: str = "admin",
+    ):
         """
         Initializes the MongoDB connection using the provided MongoDB URL, database name, and collection name.
         If the mongo_url is not provided, it attempts to retrieve it from the environment variable "MONGO_URL".
@@ -37,7 +43,7 @@ class MongoDB:
                 host=mongo_url,
                 serverSelectionTimeoutMS=5000,
                 appname=os.getenv("SERVICE_NAME", "flask-app-template"),
-                connect=True
+                connect=True,
             )
 
             self.__db = self.__client[database_name]
@@ -115,14 +121,14 @@ class MongoDB:
 
     def find_one(self, query) -> Optional[dict]:
         """
-       Finds a single document in the collection matching the query.
+        Finds a single document in the collection matching the query.
 
-       Args:
-           query (dict): The query criteria to apply.
+        Args:
+            query (dict): The query criteria to apply.
 
-       Returns:
-           dict or None: The first document matching the query, or None if the query fails.
-       """
+        Returns:
+            dict or None: The first document matching the query, or None if the query fails.
+        """
         try:
             return self.collection.find_one(query)
         except PyMongoError as exc:
@@ -131,15 +137,15 @@ class MongoDB:
 
     def update_one(self, query, update) -> Optional[int]:
         """
-       Updates a single document in the collection matching the query.
+        Updates a single document in the collection matching the query.
 
-       Args:
-           query (dict): The query criteria for the document to update.
-           update (dict): The update operations to apply.
+        Args:
+            query (dict): The query criteria for the document to update.
+            update (dict): The update operations to apply.
 
-       Returns:
-           int or None: The count of documents modified, or None if the update fails.
-       """
+        Returns:
+            int or None: The count of documents modified, or None if the update fails.
+        """
         try:
             result = self.collection.update_one(query, update)
             return result.modified_count

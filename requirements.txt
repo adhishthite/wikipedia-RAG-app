@@ -6,3 +6,6 @@ python-dotenv
 pytest
 redis
 pymongo
+requests
+beautifulsoup4
+black

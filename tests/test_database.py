@@ -15,7 +15,7 @@ def mongo_client(request):
     if hasattr(request, "cls"):
         request.cls.mongo = mongo_instance
     yield mongo_instance
-    mongo_instance.drop_db('test_db')  # Cleanup: Drop the test database after tests
+    mongo_instance.drop_db("test_db")  # Cleanup: Drop the test database after tests
     mongo_instance.close()
 
 
@@ -60,16 +60,24 @@ class TestMongoDB:
 
     def test_update_many(self):
         # Setup: Insert multiple documents to update
-        self.mongo.insert_many([{"category": "update_many_test"}, {"category": "update_many_test"}])
-        update_result = self.mongo.update_many({"category": "update_many_test"}, {"$set": {"updated": True}})
+        self.mongo.insert_many(
+            [{"category": "update_many_test"}, {"category": "update_many_test"}]
+        )
+        update_result = self.mongo.update_many(
+            {"category": "update_many_test"}, {"$set": {"updated": True}}
+        )
         assert update_result > 0
         # Verify that the documents are updated
-        updated_docs = self.mongo.find({"category": "update_many_test", "updated": True})
+        updated_docs = self.mongo.find(
+            {"category": "update_many_test", "updated": True}
+        )
         assert len(updated_docs) > 1
 
     def test_delete_many(self):
         # Setup: Insert multiple documents to delete
-        self.mongo.insert_many([{"category": "delete_many_test"}, {"category": "delete_many_test"}])
+        self.mongo.insert_many(
+            [{"category": "delete_many_test"}, {"category": "delete_many_test"}]
+        )
         delete_result = self.mongo.delete_many({"category": "delete_many_test"})
         assert delete_result > 0
         # Verify that the documents are deleted
@@ -77,41 +85,75 @@ class TestMongoDB:
         assert len(deleted_docs) == 0
 
     def test_exception_handling_insert_one(self):
-        with patch('pymongo.collection.Collection.insert_one', side_effect=PyMongoError):
+        with patch(
+            "pymongo.collection.Collection.insert_one", side_effect=PyMongoError
+        ):
             result = self.mongo.insert_one({"name": "Exception Test"})
-            assert result is None, "Expected insert_one to handle PyMongoError by returning None"
+            assert (
+                result is None
+            ), "Expected insert_one to handle PyMongoError by returning None"
 
     def test_exception_handling_insert_many(self):
-        with patch('pymongo.collection.Collection.insert_many', side_effect=BulkWriteError({})):
-            result = self.mongo.insert_many([{"name": "Exception Test 1"}, {"name": "Exception Test 2"}])
-            assert result is None, "Expected insert_many to handle BulkWriteError by returning None"
+        with patch(
+            "pymongo.collection.Collection.insert_many", side_effect=BulkWriteError({})
+        ):
+            result = self.mongo.insert_many(
+                [{"name": "Exception Test 1"}, {"name": "Exception Test 2"}]
+            )
+            assert (
+                result is None
+            ), "Expected insert_many to handle BulkWriteError by returning None"
 
     def test_exception_handling_find(self):
-        with patch('pymongo.collection.Collection.find', side_effect=PyMongoError):
+        with patch("pymongo.collection.Collection.find", side_effect=PyMongoError):
             result = self.mongo.find({"name": "Exception Test"})
-            assert result is None, "Expected find to handle PyMongoError by returning None"
+            assert (
+                result is None
+            ), "Expected find to handle PyMongoError by returning None"
 
     def test_exception_handling_find_one(self):
-        with patch('pymongo.collection.Collection.find_one', side_effect=PyMongoError):
+        with patch("pymongo.collection.Collection.find_one", side_effect=PyMongoError):
             result = self.mongo.find_one({"name": "Exception Test"})
-            assert result is None, "Expected find_one to handle PyMongoError by returning None"
+            assert (
+                result is None
+            ), "Expected find_one to handle PyMongoError by returning None"
 
     def test_exception_handling_update_one(self):
-        with patch('pymongo.collection.Collection.update_one', side_effect=PyMongoError):
-            result = self.mongo.update_one({"name": "Original Name"}, {"$set": {"name": "Updated Name"}})
-            assert result is None, "Expected update_one to handle PyMongoError by returning None"
+        with patch(
+            "pymongo.collection.Collection.update_one", side_effect=PyMongoError
+        ):
+            result = self.mongo.update_one(
+                {"name": "Original Name"}, {"$set": {"name": "Updated Name"}}
+            )
+            assert (
+                result is None
+            ), "Expected update_one to handle PyMongoError by returning None"
 
     def test_exception_handling_update_many(self):
-        with patch('pymongo.collection.Collection.update_many', side_effect=PyMongoError):
-            result = self.mongo.update_many({"name": "Original Name"}, {"$set": {"name": "Updated Name"}})
-            assert result is None, "Expected update_many to handle PyMongoError by returning None"
+        with patch(
+            "pymongo.collection.Collection.update_many", side_effect=PyMongoError
+        ):
+            result = self.mongo.update_many(
+                {"name": "Original Name"}, {"$set": {"name": "Updated Name"}}
+            )
+            assert (
+                result is None
+            ), "Expected update_many to handle PyMongoError by returning None"
 
     def test_exception_handling_delete_one(self):
-        with patch('pymongo.collection.Collection.delete_one', side_effect=PyMongoError):
+        with patch(
+            "pymongo.collection.Collection.delete_one", side_effect=PyMongoError
+        ):
             result = self.mongo.delete_one({"name": "Delete Test"})
-            assert result is None, "Expected delete_one to handle PyMongoError by returning None"
+            assert (
+                result is None
+            ), "Expected delete_one to handle PyMongoError by returning None"
 
     def test_exception_handling_delete_many(self):
-        with patch('pymongo.collection.Collection.delete_many', side_effect=PyMongoError):
+        with patch(
+            "pymongo.collection.Collection.delete_many", side_effect=PyMongoError
+        ):
             result = self.mongo.delete_many({"name": "Delete Test"})
-            assert result is None, "Expected delete_many to handle PyMongoError by returning None"
+            assert (
+                result is None
+            ), "Expected delete_many to handle PyMongoError by returning None"
