@@ -1,0 +1,8 @@
+Flask==3.0.2
+elastic-apm[flask]
+psutil
+gunicorn
+python-dotenv
+pytest
+redis
+pymongo

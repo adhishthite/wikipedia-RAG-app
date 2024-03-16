@@ -1,0 +1,59 @@
+# .github/workflows/pytest.yaml
+name: PyTest
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+        matrix:
+            python-version: ['3.12']
+            mongodb-version: ['7.0']
+
+    timeout-minutes: 10
+
+    name: PyTests
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+          python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest-cov diff-cover
+
+    - name: Start MongoDB
+      uses: supercharge/mongodb-github-action@1.10.0
+
+    - name: Run tests with PyTest
+      env:
+        SERVICE_NAME: "flask-app-template"
+        ENVIRONMENT: "development"
+        SECRET_TOKEN: "secret-token"
+        SERVER_URL: "http://localhost:5000"
+        MONGO_URL: "localhost"
+
+      run: |
+        set -o pipefail
+        pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=app tests/ | tee pytest-coverage.txt
+        coverage xml
+        exit ${PIPESTATUS[0]}
+
+    - name: PyTest Coverage Commentator
+      uses: MishaKav/pytest-coverage-comment@main
+      with:
+        pytest-coverage-path: ./pytest-coverage.txt
+        junitxml-path: ./pytest.xml
