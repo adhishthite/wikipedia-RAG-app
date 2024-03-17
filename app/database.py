@@ -1,10 +1,9 @@
 import os
 from typing import Optional
 
-
 import pymongo
-from pymongo.errors import BulkWriteError, ConnectionFailure, PyMongoError
 from bson import ObjectId
+from pymongo.errors import BulkWriteError, ConnectionFailure, PyMongoError
 
 
 class MongoDB:
@@ -18,10 +17,10 @@ class MongoDB:
     """
 
     def __init__(
-        self,
-        mongo_url: str,
-        database_name: str = "admin",
-        collection_name: str = "admin",
+            self,
+            mongo_url: str,
+            database_name: str = "admin",
+            collection_name: str = "admin",
     ):
         """
         Initializes the MongoDB connection using the provided MongoDB URL, database name, and collection name.

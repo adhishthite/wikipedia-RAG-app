@@ -1,10 +1,11 @@
-# Flask App Template
+# Wikipedia Crawler
 
-This is a template of a Flask App that uses NGINX and GUNICORN for deployment.
+This app crawls through Wikipedia and stores the pages in JSON files. The JSONs can be used for RAG and LLM-finetuning.
+This is still a Work in Progress, so please feel expected to see some bugs.
 
 ## Overview
 
-The Flask App Template is designed to provide a starting point for developing web applications using the Flask framework. It includes integration with NGINX and GUNICORN for efficient deployment.
+This Wikipedia Crawler has APIs to crawl through Wikipedia and store the pages in JSON files. The JSONs can be used for RAG and LLM-finetuning. The app is built using Flask and MongoDB for data storage. The app is containerized using Docker and can be deployed using GitHub Actions.
 
 ## Features
 
@@ -22,13 +23,13 @@ To get started with this template, follow these steps:
 0. Clone the repository.
 
     ```bash
-    git clone https://github.com/adhishthite/flask-app-template
+    git clone https://github.com/adhishthite/wikipedia-RAG-app.git
     ```
 
 1. Navigate to the repository
 
     ```bash
-    cd flask-app-template
+    cd wikipedia-RAG-app
     ```
 
 2. Rename the `.env-t` file to `.env` and add/update the required environment variables.

@@ -1,9 +1,9 @@
 import os
 
-from flask import Flask, jsonify
 import elasticapm
-from elasticapm.contrib.flask import ElasticAPM
 from dotenv import load_dotenv
+from elasticapm.contrib.flask import ElasticAPM
+from flask import Flask, jsonify
 
 from . import data
 
@@ -14,8 +14,8 @@ if os.environ["ENVIRONMENT"] == "production":
     app.config["ELASTIC_APM"] = {
         "SERVICE_NAME": os.environ["SERVICE_NAME"],
         "SECRET_TOKEN": os.environ["SECRET_TOKEN"],
-        "SERVER_URL": os.environ["SERVER_URL"],
-        "ENVIRONMENT": os.environ["ENVIRONMENT"],
+        "SERVER_URL"  : os.environ["SERVER_URL"],
+        "ENVIRONMENT" : os.environ["ENVIRONMENT"],
     }
 
     apm = ElasticAPM(app)
