@@ -47,8 +47,8 @@ def process_and_store_page(url: str):
 
     data = {"title": title, "url": url, "content": text}
 
-    # create a unique file name using hashing algorithm
-    file_name = hashlib.md5(string=url.encode()).hexdigest()
+    # Create a unique file name using MD5 hashing algorithm
+    file_name = get_string_hash(url)
 
     with open(
             os.path.join("data", f"{file_name}.json"), "w"
@@ -58,7 +58,7 @@ def process_and_store_page(url: str):
 
 def crawl_and_process_page(args):
     """Crawls and processes a single Wikipedia page."""
-    current_url, depth, max_depth, rp, visited, to_visit = args
+    current_url, depth, max_depth, rp, visited, to_visit, crawled_urls = args
 
     new_links = []
 
@@ -67,7 +67,12 @@ def crawl_and_process_page(args):
 
         if rp.can_fetch("*", current_url):
             print(f"Visiting: {current_url} at depth {depth}")
-            process_and_store_page(current_url)
+
+            url_hash = get_string_hash(current_url)
+            if url_hash not in crawled_urls:
+                process_and_store_page(current_url)
+            else:
+                print(f"Skipping: (Already processed) {url_hash}")
 
             if depth < max_depth:
                 links = get_wiki_links(current_url)
@@ -85,6 +90,7 @@ def crawl_and_process_page(args):
 def crawl_wikipedia(start_url: str, max_depth: int = 2):
     """Crawls Wikipedia pages."""
     init_data_folder()  # Create data folder if it doesn't exist
+    crawled_urls: set = get_crawled_urls()  # Get a list of already crawled URLs
 
     rp = RobotFileParser()
     rp.set_url("https://mr.wikipedia.org/robots.txt")
@@ -94,11 +100,11 @@ def crawl_wikipedia(start_url: str, max_depth: int = 2):
     visited = manager.list()
     to_visit = manager.list([(start_url, 0)])  # A queue of (url, depth) pairs
 
-    with Pool(processes=8) as pool:
+    with Pool(processes=os.cpu_count()) as pool:
         with tqdm(total=0, desc="Crawling", unit="page") as pbar:
             while to_visit:
                 args_list = [
-                    (url, depth, max_depth, rp, visited, to_visit)
+                    (url, depth, max_depth, rp, visited, to_visit, crawled_urls)
                     for url, depth in to_visit
                 ]
                 results = pool.map(crawl_and_process_page, args_list)
@@ -108,6 +114,19 @@ def crawl_wikipedia(start_url: str, max_depth: int = 2):
                 pbar.update(len(args_list))
 
 
+def get_crawled_urls(data_path: str = "data") -> set[str]:
+    """Returns a list of crawled URLs."""
+    if not os.path.exists(data_path):
+        return set()
+    # Strip the extension and get the hash of the filename
+    return set([file_name.split(".")[0] for file_name in os.listdir(data_path)])
+
+
+def get_string_hash(string: str) -> str:
+    """Returns the MD5 hash of a string."""
+    return hashlib.md5(string.encode()).hexdigest()
+
+
 if __name__ == "__main__":
-    start_page = "https://mr.wikipedia.org/wiki/%E0%A4%AE%E0%A4%B9%E0%A4%BE%E0%A4%B0%E0%A4%BE%E0%A4%B7%E0%A5%8D%E0%A4%9F%E0%A5%8D%E0%A4%B0"
+    start_page = "https://mr.wikipedia.org/wiki/%E0%A4%A4%E0%A4%BF%E0%A4%AC%E0%A5%87%E0%A4%9F%E0%A5%80_%E0%A4%AD%E0%A4%BE%E0%A4%B7%E0%A4%BE"
     crawl_wikipedia(start_url=start_page, max_depth=3)  # Start the crawl
